@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Box from '@mui/material/Box';
@@ -10,34 +10,57 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 
+const API_URL = 'http://localhost:5000/api/users';
+
 function UserForm() {
   const [form, setForm] = useState({
     userId: '',
     userName: '',
-    email: ''
+    email: '',
+    _id: null
   });
   const [submitted, setSubmitted] = useState([]);
   const [editIndex, setEditIndex] = useState(null);
+
+  // Fetch users from backend
+  useEffect(() => {
+    fetch(API_URL)
+      .then(res => res.json())
+      .then(data => setSubmitted(data));
+  }, []);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (editIndex !== null) {
-      // Update existing entry
-      setSubmitted(prev => prev.map((entry, idx) => idx === editIndex ? form : entry));
-      setEditIndex(null);
+    if (form._id) {
+      // Update existing user
+      const res = await fetch(`${API_URL}/${form._id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form)
+      });
+      const updatedUser = await res.json();
+      setSubmitted(prev => prev.map(u => u._id === updatedUser._id ? updatedUser : u));
     } else {
-      // Add new entry
-      setSubmitted(prev => [...prev, form]);
+      // Add new user
+      const res = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: form.userId, userName: form.userName, email: form.email })
+      });
+      const newUser = await res.json();
+      setSubmitted(prev => [...prev, newUser]);
     }
-    setForm({ userId: '', userName: '', email: '' });
+    setForm({ userId: '', userName: '', email: '', _id: null });
+    setEditIndex(null);
   };
 
   const handleRowClick = (idx) => {
-    setForm(submitted[idx]);
+    const user = submitted[idx];
+    setForm({ ...user });
     setEditIndex(idx);
   };
 
@@ -49,7 +72,7 @@ function UserForm() {
         <TextField label="User Name" name="userName" value={form.userName} onChange={handleChange} required />
         <TextField label="Email Address" name="email" value={form.email} onChange={handleChange} required />
         <Button variant="contained" color="primary" type="submit" size="large">
-          Save
+          {form._id ? 'Update' : 'Save'}
         </Button>
       </Box>
       {submitted.length > 0 && (
@@ -64,7 +87,7 @@ function UserForm() {
             </TableHead>
             <TableBody>
               {submitted.map((entry, idx) => (
-                <TableRow key={idx} hover style={{ cursor: 'pointer' }} onClick={() => handleRowClick(idx)}>
+                <TableRow key={entry._id} hover style={{ cursor: 'pointer' }} onClick={() => handleRowClick(idx)}>
                   <TableCell>{entry.userId}</TableCell>
                   <TableCell>{entry.userName}</TableCell>
                   <TableCell>{entry.email}</TableCell>
