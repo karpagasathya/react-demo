@@ -1,0 +1,40 @@
+const express = require('express');
+const mongoose = require('mongoose');
+const cors = require('cors');
+
+const app = express();
+app.use(express.json());
+app.use(cors());
+
+// Connect to MongoDB Atlas (specify database name 'Demo')
+mongoose.connect('mongodb+srv://username:password@mymongofreecluster.w0swajs.mongodb.net/demo?retryWrites=true&w=majority&appName=mymongofreecluster', { useNewUrlParser: true, useUnifiedTopology: true });
+
+// Define User schema and model
+const userSchema = new mongoose.Schema({
+  userId: String,
+  userName: String,
+  email: String,
+});
+const User = mongoose.model('User', userSchema);
+
+// Get all users
+app.get('/api/users', async (req, res) => {
+  const users = await User.find();
+  res.json(users);
+});
+
+// Add a new user
+app.post('/api/users', async (req, res) => {
+  const user = new User(req.body);
+  await user.save();
+  res.json(user);
+});
+
+// Update a user
+app.put('/api/users/:id', async (req, res) => {
+  const user = await User.findByIdAndUpdate(req.params.id, req.body, { new: true });
+  res.json(user);
+});
+
+app.listen(5000, () => console.log('Server started on port 5000'));
+// The collection name 'users' will be used automatically by Mongoose for the User model.
