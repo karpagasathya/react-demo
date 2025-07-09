@@ -7,7 +7,7 @@ app.use(express.json());
 app.use(cors());
 
 // Connect to MongoDB Atlas (specify database name 'Demo')
-mongoose.connect('mongodb+srv://username:password@mymongofreecluster.w0swajs.mongodb.net/demo?retryWrites=true&w=majority&appName=mymongofreecluster', { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true });
 
 // Define User schema and model
 const userSchema = new mongoose.Schema({
