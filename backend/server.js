@@ -36,6 +36,12 @@ app.put('/api/users/:id', async (req, res) => {
   res.json(user);
 });
 
+// Delete a user
+app.delete('/api/users/:id', async (req, res) => {
+  await User.findByIdAndDelete(req.params.id);
+  res.json({ success: true });
+});
+
 // Add a root route for homepage
 app.get('/', (req, res) => {
   res.send('Backend is running!');
