@@ -10,7 +10,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 
-const API_URL = 'http://localhost:5000/api/users';
+const API_URL = 'https://react-demo-77dq.onrender.com/api/users';
 
 function UserForm() {
   const [form, setForm] = useState({
