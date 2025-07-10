@@ -36,5 +36,10 @@ app.put('/api/users/:id', async (req, res) => {
   res.json(user);
 });
 
+// Add a root route for homepage
+app.get('/', (req, res) => {
+  res.send('Backend is running!');
+});
+
 app.listen(5000, () => console.log('Server started on port 5000'));
 // The collection name 'users' will be used automatically by Mongoose for the User model.
