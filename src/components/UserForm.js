@@ -9,6 +9,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 const API_URL = 'https://react-demo-77dq.onrender.com/api/users';
 
@@ -64,6 +65,15 @@ function UserForm() {
     setEditIndex(idx);
   };
 
+  const handleDelete = async (id) => {
+    await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+    setSubmitted(prev => prev.filter(u => u._id !== id));
+    if (form._id === id) {
+      setForm({ userId: '', userName: '', email: '', _id: null });
+      setEditIndex(null);
+    }
+  };
+
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: '#f5f6fa', p: 4 }}>
       <h2 style={{ fontSize: '2.5rem', textAlign: 'left', color: '#1976d2', marginBottom: 32 }}>User Entry Form</h2>
@@ -83,6 +93,7 @@ function UserForm() {
                 <TableCell><strong>User Identifier</strong></TableCell>
                 <TableCell><strong>User Name</strong></TableCell>
                 <TableCell><strong>Email Address</strong></TableCell>
+                <TableCell><strong>Action</strong></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -91,6 +102,17 @@ function UserForm() {
                   <TableCell>{entry.userId}</TableCell>
                   <TableCell>{entry.userName}</TableCell>
                   <TableCell>{entry.email}</TableCell>
+                  <TableCell>
+                    <Button
+                      variant="outlined"
+                      color="error"
+                      size="small"
+                      onClick={e => { e.stopPropagation(); handleDelete(entry._id); }}
+                      startIcon={<DeleteIcon />}
+                    >
+                      Delete
+                    </Button>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
